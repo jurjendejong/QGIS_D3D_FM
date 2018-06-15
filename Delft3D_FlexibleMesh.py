@@ -314,6 +314,9 @@ class Delft3D_FlexibleMesh:
         self.dlg.comboBox.clear()
         self.dlg.comboBox.addItems(layer_list)
         
+        selectedLayer = layer_list.index(self.iface.activeLayer().name())
+        self.dlg.comboBox.setCurrentIndex(selectedLayer)
+        
         # show the dialog
         self.dlg.show()
         # Run the dialog event loop
@@ -343,7 +346,11 @@ class Delft3D_FlexibleMesh:
                 output_file = open(filename,'w')
                 for iFeature,f in enumerate(selectedLayer.getFeatures()):
                     geomLine = f.geometry().asPolyline()
-                    output_file.write('Feature{}\n'.format(iFeature))
+                    if len(f.attributes())>0:
+                        featureName = f.attributes()[0].replace(' ','_')
+                    else:
+                        featureName = 'Feature_{}'.format(iFeature)
+                    output_file.write(featureName + '\n')
                     output_file.write('{},{}\n'.format(len(geomLine),2))
                     for g in geomLine:
                         output_file.write('{:.3f},{:.3f}\n'.format(g.x(),g.y()))
