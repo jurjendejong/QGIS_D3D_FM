@@ -21,16 +21,17 @@
  ***************************************************************************/
 """
 from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, QFileInfo, QVariant
-from PyQt4.QtGui import QAction, QIcon, QFileDialog
+from PyQt4.QtGui import QAction, QIcon, QFileDialog, QMessageBox
 # Initialize Qt resources from file resources.py
 import resources
 # Import the code for the dialog
 from Delft3D_FlexibleMesh_dialog import Delft3D_FlexibleMeshDialog
 import os
 import shutil
-from qgis.core import QGis, QgsProject, QgsVectorLayer, QgsField, QgsFeature, QgsGeometry, QgsPoint, QgsMapLayerRegistry, QgsPalLayerSettings
+from qgis.core import QGis, QgsProject, QgsVectorLayer, QgsField, QgsFeature, QgsGeometry, QgsPoint, QgsMapLayerRegistry, QgsPalLayerSettings, QgsLayerDefinition
 from qgis.gui import QgsMessageBar
 import tekal as tek
+import glob
 
 class Delft3D_FlexibleMesh:
     """QGIS Plugin Implementation."""
@@ -61,14 +62,13 @@ class Delft3D_FlexibleMesh:
             if qVersion() > '4.3.3':
                 QCoreApplication.installTranslator(self.translator)
 
-
         # Declare instance attributes
         self.actions = []
         self.menu = self.tr(u'&Delft3D FlexibleMesh Toolbox')
         # TODO: We are going to let the user set this up in a future iteration
         self.toolbar = self.iface.addToolBar(u'Delft3D_FlexibleMesh')
         self.toolbar.setObjectName(u'Delft3D_FlexibleMesh')
-        
+
         # default directory
         self.directory = '.'
 
@@ -190,6 +190,20 @@ class Delft3D_FlexibleMesh:
             icon_path,
             text='Open Baseline tree',
             callback=self.run_open,
+            parent=self.iface.mainWindow())
+            
+        icon_path = ':/plugins/Delft3D_FlexibleMesh/icon.png'
+        self.add_action(
+            icon_path,
+            text='Add Baseline6 tree',
+            callback=self.run_open_Baseline6,
+            parent=self.iface.mainWindow())
+            
+        icon_path = ':/plugins/Delft3D_FlexibleMesh/icon.png'
+        self.add_action(
+            icon_path,
+            text='Add FM snapped features',
+            callback=self.run_open_grid_snapped,
             parent=self.iface.mainWindow())
 
 
@@ -322,83 +336,85 @@ class Delft3D_FlexibleMesh:
         # Run the dialog event loop
         result = self.dlg.exec_()
         # See if OK was pressed
-        if result:
-            filename = self.dlg.lineEdit.text()
-            # filename = r'D:\Temp\test1.pol'
-            
-            selectedLayerIndex = self.dlg.comboBox.currentIndex()
-            selectedLayer = layers[selectedLayerIndex]
-            fields = selectedLayer.pendingFields()
-            fieldnames = [field.name() for field in fields]
-            
-            
-            if selectedLayer.wkbType() == QGis.WKBPoint:
-                print('Processing to xyz')
-                output_file = open(filename,'w')
-                for f in selectedLayer.getFeatures():
-                    geomPoint = f.geometry().asPoint()
-                    line = '{:.3f},{:.3f},'.format(geomPoint.x(),geomPoint.y()) + ','.join(unicode(f[x]) for x in fieldnames) + '\n'
-                    line = line.encode('utf-8')
-                    output_file.write(line)
-                output_file.close()
-            elif selectedLayer.wkbType() == QGis.WKBLineString or selectedLayer.wkbType() == QGis.WKBLineString25D:
-                print('Processing to ldb (polyline)')
-                output_file = open(filename,'w')
-                for iFeature,f in enumerate(selectedLayer.getFeatures()):
-                    geomLine = f.geometry().asPolyline()
-                    if len(f.attributes())>0:
-                        featureName = f.attributes()[0].replace(' ','_')
-                    else:
-                        featureName = 'Feature_{}'.format(iFeature)
-                    output_file.write(featureName + '\n')
+        if not result:
+            return
+
+        filename = self.dlg.lineEdit.text()
+        # filename = r'D:\Temp\test1.pol'
+        
+        selectedLayerIndex = self.dlg.comboBox.currentIndex()
+        selectedLayer = layers[selectedLayerIndex]
+        fields = selectedLayer.pendingFields()
+        fieldnames = [field.name() for field in fields]
+        
+        
+        if selectedLayer.wkbType() == QGis.WKBPoint:
+            print('Processing to xyz')
+            output_file = open(filename,'w')
+            for f in selectedLayer.getFeatures():
+                geomPoint = f.geometry().asPoint()
+                line = '{:.3f},{:.3f},'.format(geomPoint.x(),geomPoint.y()) + ','.join(unicode(f[x]) for x in fieldnames) + '\n'
+                line = line.encode('utf-8')
+                output_file.write(line)
+            output_file.close()
+        elif selectedLayer.wkbType() == QGis.WKBLineString or selectedLayer.wkbType() == QGis.WKBLineString25D:
+            print('Processing to ldb (polyline)')
+            output_file = open(filename,'w')
+            for iFeature,f in enumerate(selectedLayer.getFeatures()):
+                geomLine = f.geometry().asPolyline()
+                if len(f.attributes())>0 and f.attributes()[0]:
+                    featureName = str(f.attributes()[0]).replace(' ','_')
+                else:
+                    featureName = 'Feature_{}'.format(iFeature)
+                output_file.write(featureName + '\n')
+                output_file.write('{} {}\n'.format(len(geomLine),2))  # Space as seperater in Deltashell
+                for g in geomLine:
+                    output_file.write('{:.3f} {:.3f}\n'.format(g.x(),g.y()))  # Space as seperater in Deltashell
+            output_file.close()
+        elif selectedLayer.wkbType() == QGis.WKBPolygon:
+            print('Processing to ldb (polygon)')
+            output_file = open(filename,'w')
+            fId=0
+            for feature in selectedLayer.getFeatures():
+                fpol=feature.geometry().asPolygon()
+                for geomLine in fpol:
+                    output_file.write('Feature{}\n'.format(fId))
                     output_file.write('{},{}\n'.format(len(geomLine),2))
                     for g in geomLine:
                         output_file.write('{:.3f},{:.3f}\n'.format(g.x(),g.y()))
-                output_file.close()
-            elif selectedLayer.wkbType() == QGis.WKBPolygon:
-                print('Processing to ldb (polygon)')
-                output_file = open(filename,'w')
-                fId=0
-                for feature in selectedLayer.getFeatures():
-                    fpol=feature.geometry().asPolygon()
+                    fId+=1
+            output_file.close()
+        elif selectedLayer.wkbType() == QGis.WKBMultiLineString:
+            print('Processing to ldb (multi polyline)')
+            output_file = open(filename,'w')
+            print('Not tested yet')
+            # fId=0
+            # for feature in selectedLayer.getFeatures():
+                # fpol=feature.geometry().asPolygon()
+                # for geomLine in fpol:
+                    # output_file.write('Feature{}\n'.format(fId))
+                    # output_file.write('{},{}\n'.format(len(geomLine),2))
+                    # for g in geomLine:
+                        # output_file.write('{:.3f},{:.3f}\n'.format(g.x(),g.y()))
+                    # fId+=1
+            # output_file.close()
+        elif selectedLayer.wkbType() == QGis.WKBMultiPolygon:
+            print('Processing to ldb (multi polygon)')
+            output_file = open(filename,'w')
+            fId=0
+            for feature in selectedLayer.getFeatures():
+                fpols=feature.geometry().asMultiPolygon()
+                for fpol in fpols:
                     for geomLine in fpol:
                         output_file.write('Feature{}\n'.format(fId))
                         output_file.write('{},{}\n'.format(len(geomLine),2))
                         for g in geomLine:
                             output_file.write('{:.3f},{:.3f}\n'.format(g.x(),g.y()))
                         fId+=1
-                output_file.close()
-            elif selectedLayer.wkbType() == QGis.WKBMultiLineString:
-                print('Processing to ldb (multi polyline)')
-                output_file = open(filename,'w')
-                print('Not tested yet')
-                # fId=0
-                # for feature in selectedLayer.getFeatures():
-                    # fpol=feature.geometry().asPolygon()
-                    # for geomLine in fpol:
-                        # output_file.write('Feature{}\n'.format(fId))
-                        # output_file.write('{},{}\n'.format(len(geomLine),2))
-                        # for g in geomLine:
-                            # output_file.write('{:.3f},{:.3f}\n'.format(g.x(),g.y()))
-                        # fId+=1
-                # output_file.close()
-            elif selectedLayer.wkbType() == QGis.WKBMultiPolygon:
-                print('Processing to ldb (multi polygon)')
-                output_file = open(filename,'w')
-                fId=0
-                for feature in selectedLayer.getFeatures():
-                    fpols=feature.geometry().asMultiPolygon()
-                    for fpol in fpols:
-                        for geomLine in fpol:
-                            output_file.write('Feature{}\n'.format(fId))
-                            output_file.write('{},{}\n'.format(len(geomLine),2))
-                            for g in geomLine:
-                                output_file.write('{:.3f},{:.3f}\n'.format(g.x(),g.y()))
-                            fId+=1
-                output_file.close()
-            else:
-                self.iface.messageBar().pushMessage("Error", 'Type of layer not recognised. wkbType: ' + str(selectedLayer.wkbType()),level=QgsMessageBar.CRITICAL)
-                
+            output_file.close()
+        else:
+            self.iface.messageBar().pushMessage("Error", 'Type of layer not recognised. wkbType: ' + str(selectedLayer.wkbType()),level=QgsMessageBar.CRITICAL)
+        DialogMessageBox('Saving finished')
 
     def run_open(self):
         # Open Baseline-project with template
@@ -426,7 +442,76 @@ class Delft3D_FlexibleMesh:
         # Open new project
         project = QgsProject.instance()
         project.read(QFileInfo(qgsfile))
-        
+
         # Zoom to extent
         canvas = self.iface.mapCanvas()
         canvas.zoomToFullExtent()
+
+    def run_open_Baseline6(self):
+        # Open Baseline-project with template
+        # Supports both: d:\modellen\baseline\Rijn\j15_5-v1\ and d:\modellen\baseline\Rijn\j15_5-v1\baseline.gdb\
+        baselinegdb = QFileDialog.getExistingDirectory(self.dlg, "Select baseline gdb-file ", '*.gdb')
+
+        if len(baselinegdb) == 0:
+            return
+
+        if not ("baseline.gdb" in baselinegdb):
+            baselinegdb = os.path.join(baselinegdb, 'baseline.gdb')
+
+        if not os.path.isdir(baselinegdb):
+            self.iface.messageBar().pushMessage("Error", "Cannot find baseline.gdb in given folder", level=QgsMessageBar.CRITICAL)
+            return
+
+        templatefile = r'c:\Users\jong_jn\.qgis2\python\plugins\Delft3D_FlexibleMesh\incl\baseline6_layer_template.qlr'
+
+        head, tail = os.path.split(baselinegdb)
+        _, baselinedirname = os.path.split(head)
+        qlrfile = os.path.join(head, 'baseline6.qlr')
+
+        # shutil.copy(templatefile, qlrfile)
+        with open(templatefile, 'r') as fin:
+            templatecontent = fin.read()
+
+        # Do adjustments to the templatecontent
+        # templatecontent = templetecontent.replace()
+
+        with open(qlrfile, 'w') as fout:
+            fout.write(templatecontent)
+
+        root = QgsProject.instance().layerTreeRoot()
+        group = root.addGroup("Baseline6_{}".format(baselinedirname))
+        QgsLayerDefinition().loadLayerDefinition(qlrfile, group)
+
+    def run_open_grid_snapped(self):
+        snappeddirectory = QFileDialog.getExistingDirectory(self.dlg, "Select snapped directory ")
+
+        allshapefiles = glob.glob(os.path.join(snappeddirectory, '*.shp'))
+
+        print(allshapefiles)
+        templatefile = r'c:\Users\jong_jn\.qgis2\python\plugins\Delft3D_FlexibleMesh\incl\snapped.qlr'
+
+        _, dirname = os.path.split(snappeddirectory)
+        qlrfile = os.path.join(snappeddirectory, 'snapped.qlr')
+
+        # shutil.copy(templatefile, qlrfile)
+        with open(templatefile, 'r') as fin:
+            templatecontent = fin.read()
+
+        # Do adjustments to the templatecontent
+        # templatecontent = templetecontent.replace()
+
+        with open(qlrfile, 'w') as fout:
+            fout.write(templatecontent)
+
+        root = QgsProject.instance().layerTreeRoot()
+        group = root.addGroup("Snapped_{}".format(dirname))
+        QgsLayerDefinition().loadLayerDefinition(qlrfile, group)
+
+
+
+
+
+def DialogMessageBox(message):
+    msgBox = QMessageBox()
+    msgBox.setText(message)
+    ret = msgBox.exec_()
