@@ -1,34 +1,31 @@
 <!DOCTYPE qgis-layer-definition>
 <qlr>
   <layer-tree-group expanded="1" checked="Qt::Checked" name="">
-    <customproperties/>
-    <layer-tree-group expanded="1" checked="Qt::Checked" name="j14_6-w6_rooster-v0.9">
       <customproperties/>
-      <layer-tree-layer expanded="1" providerKey="ogr" checked="Qt::Checked" id="Maas_snapped_src20181113115034546" source="P:/11202220-kpp-zoet-2018/003-Maas-G6/C_Work/4_GIS/Baseline_snapped/snapped_j14_6-w6_rooster-v0.9/Maas_snapped_src.shp" name="Maas_snapped_src">
+      <layer-tree-layer expanded="1" providerKey="ogr" checked="Qt::Checked" id="Maas_snapped_src20181113115034546" source="Maas_snapped_src.shp" name="Maas_snapped_src">
         <customproperties/>
       </layer-tree-layer>
-      <layer-tree-layer expanded="1" providerKey="ogr" checked="Qt::Checked" id="Maas_snapped_crs20181026120459686" source="P:/11202220-kpp-zoet-2018/003-Maas-G6/C_Work/4_GIS/Baseline_snapped/snapped_j14_6-w6_rooster-v0.9/Maas_snapped_crs.shp" name="Maas_snapped_crs">
+      <layer-tree-layer expanded="1" providerKey="ogr" checked="Qt::Checked" id="Maas_snapped_crs20181026120459686" source="Maas_snapped_crs.shp" name="Maas_snapped_crs">
         <customproperties/>
       </layer-tree-layer>
-      <layer-tree-layer expanded="1" providerKey="ogr" checked="Qt::Checked" id="Maas_snapped_weir20181026120501452" source="P:/11202220-kpp-zoet-2018/003-Maas-G6/C_Work/4_GIS/Baseline_snapped/snapped_j14_6-w6_rooster-v0.9/Maas_snapped_weir.shp" name="Maas_snapped_weir">
+      <layer-tree-layer expanded="1" providerKey="ogr" checked="Qt::Checked" id="Maas_snapped_weir20181026120501452" source="Maas_snapped_weir.shp" name="Maas_snapped_weir">
         <customproperties/>
       </layer-tree-layer>
-      <layer-tree-layer expanded="1" providerKey="ogr" checked="Qt::Checked" id="Maas_snapped_thd20181026120501153" source="P:/11202220-kpp-zoet-2018/003-Maas-G6/C_Work/4_GIS/Baseline_snapped/snapped_j14_6-w6_rooster-v0.9/Maas_snapped_thd.shp" name="Maas_snapped_thd">
+      <layer-tree-layer expanded="1" providerKey="ogr" checked="Qt::Checked" id="Maas_snapped_thd20181026120501153" source="Maas_snapped_thd.shp" name="Maas_snapped_thd">
         <customproperties/>
       </layer-tree-layer>
-      <layer-tree-layer expanded="1" providerKey="ogr" checked="Qt::Checked" id="Maas_snapped_obs20181026120500841" source="P:/11202220-kpp-zoet-2018/003-Maas-G6/C_Work/4_GIS/Baseline_snapped/snapped_j14_6-w6_rooster-v0.9/Maas_snapped_obs.shp" name="Maas_snapped_obs">
+      <layer-tree-layer expanded="1" providerKey="ogr" checked="Qt::Checked" id="Maas_snapped_obs20181026120500841" source="Maas_snapped_obs.shp" name="Maas_snapped_obs">
         <customproperties/>
       </layer-tree-layer>
-      <layer-tree-layer expanded="1" providerKey="ogr" checked="Qt::Checked" id="Maas_snapped_gate20181026120500560" source="P:/11202220-kpp-zoet-2018/003-Maas-G6/C_Work/4_GIS/Baseline_snapped/snapped_j14_6-w6_rooster-v0.9/Maas_snapped_gate.shp" name="Maas_snapped_gate">
+      <layer-tree-layer expanded="1" providerKey="ogr" checked="Qt::Checked" id="Maas_snapped_gate20181026120500560" source="Maas_snapped_gate.shp" name="Maas_snapped_gate">
         <customproperties/>
       </layer-tree-layer>
-      <layer-tree-layer expanded="1" providerKey="ogr" checked="Qt::Checked" id="Maas_snapped_fxw20181026120500295" source="P:/11202220-kpp-zoet-2018/003-Maas-G6/C_Work/4_GIS/Baseline_snapped/snapped_j14_6-w6_rooster-v0.9/Maas_snapped_fxw.shp" name="Maas_snapped_fxw">
+      <layer-tree-layer expanded="1" providerKey="ogr" checked="Qt::Checked" id="Maas_snapped_fxw20181026120500295" source="Maas_snapped_fxw.shp" name="Maas_snapped_fxw">
         <customproperties/>
       </layer-tree-layer>
-      <layer-tree-layer expanded="1" providerKey="ogr" checked="Qt::Checked" id="Maas_snapped_dryarea20181026120500030" source="P:/11202220-kpp-zoet-2018/003-Maas-G6/C_Work/4_GIS/Baseline_snapped/snapped_j14_6-w6_rooster-v0.9/Maas_snapped_dryarea.shp" name="Maas_snapped_dryarea">
+      <layer-tree-layer expanded="1" providerKey="ogr" checked="Qt::Checked" id="Maas_snapped_dryarea20181026120500030" source="Maas_snapped_dryarea.shp" name="Maas_snapped_dryarea">
         <customproperties/>
       </layer-tree-layer>
-    </layer-tree-group>
   </layer-tree-group>
   <maplayers>
     <maplayer simplifyAlgorithm="0" minimumScale="0" maximumScale="1e+08" simplifyDrawingHints="1" minLabelScale="0" maxLabelScale="1e+08" simplifyDrawingTol="1" readOnly="0" geometry="Line" simplifyMaxScale="1" type="vector" hasScaleBasedVisibilityFlag="0" simplifyLocal="1" scaleBasedLabelVisibilityFlag="0">

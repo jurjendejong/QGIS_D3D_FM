@@ -479,7 +479,7 @@ class Delft3D_FlexibleMesh:
             fout.write(templatecontent)
 
         root = QgsProject.instance().layerTreeRoot()
-        group = root.addGroup("Baseline6_{}".format(baselinedirname))
+        group = root.insertGroup(0,"Baseline6_{}".format(baselinedirname))
         QgsLayerDefinition().loadLayerDefinition(qlrfile, group)
 
     def run_open_grid_snapped(self):
@@ -504,7 +504,7 @@ class Delft3D_FlexibleMesh:
             fout.write(templatecontent)
 
         root = QgsProject.instance().layerTreeRoot()
-        group = root.addGroup("Snapped_{}".format(dirname))
+        group = root.insertGroup(0, "Snapped_{}".format(dirname))
         QgsLayerDefinition().loadLayerDefinition(qlrfile, group)
 
 
