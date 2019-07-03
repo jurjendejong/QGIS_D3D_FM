@@ -1,8 +1,6 @@
 <!DOCTYPE qgis-layer-definition>
 <qlr>
   <layer-tree-group expanded="1" checked="Qt::PartiallyChecked" name="">
-    <customproperties/>
-    <layer-tree-group expanded="1" checked="Qt::PartiallyChecked" name="Baseline_j14_6-w6">
       <customproperties/>
       <layer-tree-group expanded="0" checked="Qt::Unchecked" name="Elevation">
         <customproperties/>
@@ -142,7 +140,6 @@
           <customproperties/>
         </layer-tree-layer>
       </layer-tree-group>
-    </layer-tree-group>
   </layer-tree-group>
   <maplayers>
     <maplayer simplifyAlgorithm="0" minimumScale="0" maximumScale="1e+08" simplifyDrawingHints="1" minLabelScale="0" maxLabelScale="1e+08" simplifyDrawingTol="1" readOnly="0" geometry="Point" simplifyMaxScale="1" type="vector" hasScaleBasedVisibilityFlag="0" simplifyLocal="1" scaleBasedLabelVisibilityFlag="0">
